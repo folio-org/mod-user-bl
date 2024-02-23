@@ -982,6 +982,7 @@ public class BLUsersAPI implements BlUsers {
               //data coming in from the service isnt returned as required by the composite user schema
               JsonObject j = new JsonObject();
               j.put("permissions", permsResponse.getBody().getJsonArray("permissionNames"));
+              logger.info("------------"+j.encode().getBytes(StandardCharsets.UTF_8).length);
               cu.setPermissions((Permissions) Response.convertToPojo(j, Permissions.class));
             }
           }
