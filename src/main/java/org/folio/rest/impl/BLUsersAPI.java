@@ -45,8 +45,6 @@ import org.folio.service.transactions.OpenTransactionsServiceImpl;
 import org.folio.util.PercentCodec;
 import org.folio.util.StringUtil;
 
-import javax.json.Json;
-import javax.json.JsonValue;
 import javax.ws.rs.core.HttpHeaders;
 
 import javax.ws.rs.core.MediaType;
@@ -70,7 +68,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 /**
  * @author shale
@@ -983,28 +980,12 @@ public class BLUsersAPI implements BlUsers {
             handleResponse(permsResponse, false, true, false, aRequestHasFailed, asyncResultHandler);
             if(!aRequestHasFailed[0] && permsResponse.getBody() != null){
 //              //data coming in from the service isnt returned as required by the composite user schema
-//              JsonObject j = new JsonObject();
-//              j.put("permissions", permsResponse.getBody().getJsonArray("permissionNames"));
-//              cu.setPermissions((Permissions) Response.convertToPojo(j, Permissions.class));
+              JsonObject j = new JsonObject();
+              j.put("permissions", permsResponse.getBody().getJsonArray("permissionNames"));
+              Permissions permissions = (Permissions) Response.convertToPojo(j, Permissions.class);
+              permissions.setPermissions(permissions.getPermissions().parallelStream().collect(Collectors.toList()));
+              cu.setPermissions(permissions);
 
-              logger.info("Yes try it....");
-              // Solution 1 -
-              JsonArray jsonArray = permsResponse.getBody().getJsonArray("permissionNames");
-
-              jsonArray.stream()
-                .filter(Permissions.class::isInstance)
-                .map(Permissions.class::cast)
-                .forEach(permissionName -> {
-                  JsonObject j = new JsonObject();
-                  j.put("permissions", Json.createArrayBuilder().add((JsonValue) permissionName).build());
-                  try {
-                    cu.setPermissions((Permissions) Response.convertToPojo(j, Permissions.class));
-                  } catch (Exception e) {
-                    throw new RuntimeException(e);
-                  }
-                });
-
-logger.info("YES did it....");
             }
           }
           cf = completedLookup.get(PERMISSIONS_INCLUDE);
