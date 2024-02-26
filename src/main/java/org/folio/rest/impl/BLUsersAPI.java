@@ -1,5 +1,9 @@
 package org.folio.rest.impl;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.vertx.core.*;
@@ -979,9 +983,12 @@ public class BLUsersAPI implements BlUsers {
             Response permsResponse = cf.get();
             handleResponse(permsResponse, false, true, false, aRequestHasFailed, asyncResultHandler);
             if(!aRequestHasFailed[0] && permsResponse.getBody() != null){
-              var permissionNames = permsResponse.getBody().getJsonArray("permissionNames").getList();
-              var permissions = new Permissions().withPermissions(permissionNames);
-              cu.setPermissions(permissions);
+//              var permissionNames = permsResponse.getBody().getJsonArray("permissionNames");
+//              findDuplicatePermissionNames(permissionNames);
+              ArrayNode permissionNames = parseJsonArray(permsResponse.getBody().toString());
+              findDuplicatePermissionNames(permissionNames);
+
+
             }
           }
           cf = completedLookup.get(PERMISSIONS_INCLUDE);
@@ -1051,6 +1058,34 @@ public class BLUsersAPI implements BlUsers {
           }
         }
         cu.setServicePointsUser(spu);
+      }
+    }
+  }
+  private static ArrayNode parseJsonArray(String json) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return (ArrayNode) mapper.readTree(json).get("permissionNames");
+    } catch (Exception e) {
+      // Handle exception (e.g., log or throw)
+      return null;
+    }
+  }
+
+  private static void findDuplicatePermissionNames(ArrayNode permissionNames) {
+    Map<String, Integer> permissionNameOccurrences = new HashMap<>();
+
+    // Iterate through the array
+    for (JsonNode permission : permissionNames) {
+      String permissionName = permission.path("permissionName").asText();
+
+      // Update the map with the count of occurrences
+      permissionNameOccurrences.put(permissionName, permissionNameOccurrences.getOrDefault(permissionName, 0) + 1);
+    }
+
+    // Print duplicate permission names and their occurrences
+    for (Map.Entry<String, Integer> entry : permissionNameOccurrences.entrySet()) {
+      if (entry.getValue() > 1) {
+        System.out.println("Duplicate Permission Name: " + entry.getKey() + ", Occurrences: " + entry.getValue());
       }
     }
   }
