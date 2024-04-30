@@ -831,7 +831,7 @@ public class BLUsersAPI implements BlUsers {
       var cql = "username==" + StringUtil.cqlEncode(encodedUsername);
       //var cql = "username==" + StringUtil.cqlEncode(entity.getUsername());
       System.out.println("6");
-      var userUrl = "/users?query=" + PercentCodec.encode(cql);
+      var userUrl = "/users?query=" + encode(cql);
       System.out.println("7");
       //run login
       try {
@@ -881,6 +881,20 @@ public class BLUsersAPI implements BlUsers {
         asyncResultHandler.handle(Future.succeededFuture(
           PostBlUsersLoginResponse.respond500WithTextPlain(ex.getLocalizedMessage())));
       }
+    }
+  }
+
+  public static CharSequence encode(CharSequence charSequence) {
+    if (charSequence != null && charSequence.length() != 0) {
+      try {
+        return URLEncoder.encode(charSequence.toString(), StandardCharsets.UTF_8.toString());
+      } catch (UnsupportedEncodingException e) {
+        // Handle encoding exception
+        e.printStackTrace();
+        return "";
+      }
+    } else {
+      return "";
     }
   }
 
