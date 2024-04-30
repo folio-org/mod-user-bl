@@ -825,7 +825,7 @@ public class BLUsersAPI implements BlUsers {
       String encodedUsername = null;
       try {
         encodedUsername = URLEncoder.encode(entity.getUsername(), StandardCharsets.UTF_8.toString());
-      } catch (UnsupportedEncodingException e) {
+       } catch (UnsupportedEncodingException e) {
         throw new RuntimeException(e);
       }
       var cql = "username==" + StringUtil.cqlEncode(encodedUsername);
@@ -866,6 +866,10 @@ public class BLUsersAPI implements BlUsers {
             }
           })
           .exceptionally(throwable -> {
+            System.out.println("11");
+            System.out.println(throwable.getLocalizedMessage());
+            System.out.println(throwable.getMessage());
+            System.out.println(throwable.getCause());
             clientForLogin.closeClient();
             asyncResultHandler.handle(Future.succeededFuture(
               PostBlUsersLoginResponse.respond500WithTextPlain(throwable.getLocalizedMessage())));
