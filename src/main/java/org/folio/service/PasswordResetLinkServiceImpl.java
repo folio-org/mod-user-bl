@@ -220,7 +220,7 @@ public class PasswordResetLinkServiceImpl implements PasswordResetLinkService {
           .compose(checkPasswordResetActionExpirationTime(passwordResetActionId))
           .compose(findUserByPasswordResetActionId(okapiConnectionParams, userIdHolder))
           .compose(validateUser(userHolder, userIdHolder))
-          .compose(r -> validatePassword(userHolder.value.getId(), newPassword, okapiConnectionParams))
+          //.compose(r -> validatePassword(userHolder.value.getId(), newPassword, okapiConnectionParams))
           .compose(res -> passwordResetActionClient.resetPassword(passwordResetActionId, newPassword, requestHeaders))
           .compose(sendPasswordChangeNotification(okapiConnectionParams, userHolder, userIdHolder))
       );

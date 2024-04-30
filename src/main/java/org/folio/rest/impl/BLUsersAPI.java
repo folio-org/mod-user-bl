@@ -798,30 +798,36 @@ public class BLUsersAPI implements BlUsers {
   private void doPostBlUsersLogin(boolean expandPerms, List<String> include, String userAgent, String xForwardedFor, //NOSONAR
       LoginCredentials entity, Map<String, String> okapiHeaders, Handler<AsyncResult<javax.ws.rs.core.Response>> asyncResultHandler,
       String loginEndpoint, BiFunction<Response, CompositeUser, javax.ws.rs.core.Response> respond) {
-
+    System.out.println("1");
     //works on single user, no joins needed , just aggregate
     String okapiURL = okapiHeaders.get(OKAPI_URL_HEADER);
     okapiHeaders.remove(OKAPI_URL_HEADER);
-
+    System.out.println("2");
     boolean []aRequestHasFailed = new boolean[]{false};
 
     if(include == null || include.isEmpty()){
       //by default return perms and groups
       include = getDefaultIncludes();
     }
-
+    System.out.println("3");
     if (entity == null || entity.getUsername() == null || entity.getPassword() == null) {
+      System.out.println("--IF--");
       asyncResultHandler.handle(Future.succeededFuture(
         PostBlUsersLoginResponse.respond400WithTextPlain("Improperly formatted request")));
     } else {
+      System.out.println("4");
       HttpClientInterface clientForLogin = HttpClientFactory.getHttpClient(okapiURL, okapiHeaders.get(OKAPI_TENANT_HEADER));
       String moduleURL = "/authn/login";
       logger.debug("Requesting login from " + moduleURL);
+      System.out.println("5");
       //can only be one user with this username - so only one result expected
       var cql = "username==" + StringUtil.cqlEncode(entity.getUsername());
+      System.out.println("6");
       var userUrl = "/users?query=" + PercentCodec.encode(cql);
+      System.out.println("7");
       //run login
       try {
+        System.out.println("8");
         Map<String, String> headers = new CaseInsensitiveMap<>(okapiHeaders);
         Optional.ofNullable(userAgent)
           .ifPresent(header -> headers.put(HttpHeaders.USER_AGENT, header));
@@ -829,7 +835,7 @@ public class BLUsersAPI implements BlUsers {
           .ifPresent(header -> headers.put(X_FORWARDED_FOR_HEADER, header));
 
         List<String> finalInclude = include;
-
+        System.out.println("9");
         clientForLogin.request(HttpMethod.POST, entity, loginEndpoint, headers)
           .thenAccept(loginResponse -> {
             //then get user by username, inject okapi headers from the login response into the user request
@@ -855,6 +861,7 @@ public class BLUsersAPI implements BlUsers {
             clientForLogin.closeClient();
             asyncResultHandler.handle(Future.succeededFuture(
               PostBlUsersLoginResponse.respond500WithTextPlain(throwable.getLocalizedMessage())));
+            System.out.println("10");
             return null;
           });
       } catch (Exception ex) {
