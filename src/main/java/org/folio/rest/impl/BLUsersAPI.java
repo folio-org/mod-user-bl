@@ -787,7 +787,7 @@ private JsonObject parseTokenPayload(String token) {
       System.out.println("r7");
 
       // Decode Base64-encoded payload
-      byte[] decodedJsonBytes = Base64.getDecoder().decode(decodedPayload);
+      byte[] decodedJsonBytes = Base64.getDecoder().decode(decodedPayload.getBytes(StandardCharsets.UTF_8));
       System.out.println("r8");
 
       // Convert byte array to string
