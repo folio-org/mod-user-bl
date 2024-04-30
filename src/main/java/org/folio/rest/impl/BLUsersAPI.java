@@ -851,8 +851,11 @@ public class BLUsersAPI implements BlUsers {
             handleResponse(loginResponse, false, false, true, aRequestHasFailed, asyncResultHandler);
             System.out.println("19");
             String token = getToken(loginResponse.getHeaders());
+            System.out.println("a");
             String tenant = getTenant(token);
+            System.out.println("b");
             okapiHeaders.put(OKAPI_TENANT_HEADER, tenant);
+            System.out.println("c");
             HttpClientInterface client = HttpClientFactory.getHttpClient(okapiURL, tenant);
             System.out.println("20");
             try {
