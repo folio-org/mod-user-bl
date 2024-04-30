@@ -849,16 +849,18 @@ public class BLUsersAPI implements BlUsers {
             //then get user by username, inject okapi headers from the login response into the user request
             //see 'true' flag passed into the chainedRequest
             handleResponse(loginResponse, false, false, true, aRequestHasFailed, asyncResultHandler);
-
+            System.out.println("19");
             String token = getToken(loginResponse.getHeaders());
             String tenant = getTenant(token);
             okapiHeaders.put(OKAPI_TENANT_HEADER, tenant);
             HttpClientInterface client = HttpClientFactory.getHttpClient(okapiURL, tenant);
-
+            System.out.println("20");
             try {
+              System.out.println("21");
               getUserWithPerms(expandPerms, okapiHeaders, asyncResultHandler, userUrl, finalInclude, tenant, loginResponse, client, respond);
             } catch (Exception e) {
               client.closeClient();
+              System.out.println("22");
               asyncResultHandler.handle(Future.succeededFuture(
                 PostBlUsersLoginResponse.respond500WithTextPlain(e.getLocalizedMessage())));
             } finally {
