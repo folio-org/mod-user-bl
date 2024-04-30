@@ -868,7 +868,7 @@ public class BLUsersAPI implements BlUsers {
           .exceptionally(throwable -> {
             System.out.println("11");
             System.out.println(throwable.getLocalizedMessage());
-            System.out.println(throwable.getMessage());
+            System.out.println(throwable.getStackTrace());
             System.out.println(throwable.getCause());
             clientForLogin.closeClient();
             asyncResultHandler.handle(Future.succeededFuture(
