@@ -49,6 +49,7 @@ import javax.ws.rs.core.HttpHeaders;
 
 import javax.ws.rs.core.MediaType;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -821,7 +822,14 @@ public class BLUsersAPI implements BlUsers {
       logger.debug("Requesting login from " + moduleURL);
       System.out.println("5");
       //can only be one user with this username - so only one result expected
-      var cql = "username==" + StringUtil.cqlEncode(entity.getUsername());
+      String encodedUsername = null;
+      try {
+        encodedUsername = URLEncoder.encode(entity.getUsername(), StandardCharsets.UTF_8.toString());
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+      }
+      var cql = "username==" + StringUtil.cqlEncode(encodedUsername);
+      //var cql = "username==" + StringUtil.cqlEncode(entity.getUsername());
       System.out.println("6");
       var userUrl = "/users?query=" + PercentCodec.encode(cql);
       System.out.println("7");
