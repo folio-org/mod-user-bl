@@ -754,6 +754,25 @@ public class BLUsersAPI implements BlUsers {
     return payload.getString("tenant");
   }
 
+//  private JsonObject parseTokenPayload(String token) {
+//    System.out.println("r3");
+//    String[] tokenParts = token.split("\\.");
+//    System.out.println("r4");
+//    if (tokenParts.length == 3) {
+//      System.out.println("r5");
+//      String encodedPayload = tokenParts[1];
+//      System.out.println("r6");
+//      byte[] decodedJsonBytes = Base64.getDecoder().decode(encodedPayload);
+//      System.out.println("r7");
+//      String decodedJson = new String(decodedJsonBytes);
+//      System.out.println("r8");
+//      return new JsonObject(decodedJson);
+//    } else {
+//      System.out.println("r9");
+//      return null;
+//    }
+//  }
+
   private JsonObject parseTokenPayload(String token) {
     System.out.println("r3");
     String[] tokenParts = token.split("\\.");
@@ -762,11 +781,24 @@ public class BLUsersAPI implements BlUsers {
       System.out.println("r5");
       String encodedPayload = tokenParts[1];
       System.out.println("r6");
-      byte[] decodedJsonBytes = Base64.getDecoder().decode(encodedPayload);
-      System.out.println("r7");
-      String decodedJson = new String(decodedJsonBytes);
-      System.out.println("r8");
-      return new JsonObject(decodedJson);
+
+      try {
+        // Decode Base64-encoded payload
+        byte[] decodedJsonBytes = Base64.getUrlDecoder().decode(encodedPayload.getBytes(StandardCharsets.UTF_8));
+        System.out.println("r7");
+
+        // Convert byte array to string using UTF-8 encoding
+        String decodedJson = new String(decodedJsonBytes, StandardCharsets.UTF_8);
+        System.out.println("r8");
+
+        // Parse JSON object from decoded string
+        return new JsonObject(decodedJson);
+      } catch (IllegalArgumentException e) {
+        // Handle the case where the payload is not a valid Base64-encoded string
+        e.printStackTrace(); // Print the stack trace for debugging
+        // You might want to return null or take other appropriate action here
+        return null;
+      }
     } else {
       System.out.println("r9");
       return null;
