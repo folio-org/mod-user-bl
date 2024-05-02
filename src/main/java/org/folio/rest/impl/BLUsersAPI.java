@@ -746,9 +746,7 @@ public class BLUsersAPI implements BlUsers {
   }
 
   private String getTenant(String token) {
-    System.out.println("r1");
     JsonObject payload = parseTokenPayload(token);
-    System.out.println("r2");
     if (payload == null) {
       return null;
     }
@@ -763,7 +761,7 @@ public class BLUsersAPI implements BlUsers {
       System.out.println("r5");
       String encodedPayload = tokenParts[1];
       System.out.println("r6");
-      byte[] decodedJsonBytes = Base64.getUrlDecoder().decode(encodedPayload);
+      byte[] decodedJsonBytes = Base64.getDecoder().decode(encodedPayload.getBytes(StandardCharsets.UTF_8));
       System.out.println("r7");
       String decodedJson = new String(decodedJsonBytes);
       System.out.println("r8");
