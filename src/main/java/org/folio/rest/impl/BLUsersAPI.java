@@ -50,6 +50,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -752,6 +753,10 @@ public class BLUsersAPI implements BlUsers {
   }
 
   private JsonObject parseTokenPayload(String token) {
+    Charset defaultCharset = Charset.defaultCharset();
+
+    // Print the default charset
+    System.out.println("Default Charset: " + defaultCharset.displayName());
     String[] tokenParts = token.split("\\.");
     if (tokenParts.length == 3) {
       String encodedPayload = tokenParts[1];
