@@ -755,57 +755,57 @@ public class BLUsersAPI implements BlUsers {
     return payload.getString("tenant");
   }
 
-//  private JsonObject parseTokenPayload(String token) {
-//    System.out.println("r3");
-//    String[] tokenParts = token.split("\\.");
-//    System.out.println("r4");
-//    if (tokenParts.length == 3) {
-//      System.out.println("r5");
-//      String encodedPayload = tokenParts[1];
-//      System.out.println("r6");
-//      byte[] decodedJsonBytes = Base64.getDecoder().decode(encodedPayload);
-//      System.out.println("r7");
-//      String decodedJson = new String(decodedJsonBytes);
-//      System.out.println("r8");
-//      return new JsonObject(decodedJson);
-//    } else {
-//      System.out.println("r9");
-//      return null;
-//    }
-//  }
-private JsonObject parseTokenPayload(String token) {
-  System.out.println("r3");
-  String[] tokenParts = token.split("\\.");
-  System.out.println("r4");
-  if (tokenParts.length == 3) {
-    System.out.println("r5");
-    String encodedPayload = tokenParts[1];
-    System.out.println("r6");
-    try {
-      // URL decode the payload to handle non-ASCII characters
-      String decodedPayload = URLDecoder.decode(encodedPayload, StandardCharsets.UTF_8.toString());
+  private JsonObject parseTokenPayload(String token) {
+    System.out.println("r3");
+    String[] tokenParts = token.split("\\.");
+    System.out.println("r4");
+    if (tokenParts.length == 3) {
+      System.out.println("r5");
+      String encodedPayload = tokenParts[1];
+      System.out.println("r6");
+      byte[] decodedJsonBytes = Base64.getUrlDecoder().decode(encodedPayload);
       System.out.println("r7");
-
-      // Decode Base64-encoded payload
-      byte[] decodedJsonBytes = Base64.getDecoder().decode(decodedPayload.getBytes(StandardCharsets.UTF_8));
+      String decodedJson = new String(decodedJsonBytes);
       System.out.println("r8");
-
-      // Convert byte array to string
-      String decodedJson = new String(decodedJsonBytes, StandardCharsets.UTF_8);
-      System.out.println("r9");
-
-      // Parse JSON object from decoded string
       return new JsonObject(decodedJson);
-    } catch (Exception e) {
-      // Handle decoding exception
-      e.printStackTrace();
+    } else {
+      System.out.println("r9");
       return null;
     }
-  } else {
-    System.out.println("r10");
-    return null;
   }
-}
+//private JsonObject parseTokenPayload(String token) {
+//  System.out.println("r3");
+//  String[] tokenParts = token.split("\\.");
+//  System.out.println("r4");
+//  if (tokenParts.length == 3) {
+//    System.out.println("r5");
+//    String encodedPayload = tokenParts[1];
+//    System.out.println("r6");
+//    try {
+//      // URL decode the payload to handle non-ASCII characters
+//      String decodedPayload = URLDecoder.decode(encodedPayload, StandardCharsets.UTF_8);
+//      System.out.println("r7");
+//
+//      // Decode Base64-encoded payload
+//      byte[] decodedJsonBytes = Base64.getDecoder().decode(decodedPayload.getBytes(StandardCharsets.UTF_8));
+//      System.out.println("r8");
+//
+//      // Convert byte array to string
+//      String decodedJson = new String(decodedJsonBytes, StandardCharsets.UTF_8);
+//      System.out.println("r9");
+//
+//      // Parse JSON object from decoded string
+//      return new JsonObject(decodedJson);
+//    } catch (Exception e) {
+//      // Handle decoding exception
+//      e.printStackTrace();
+//      return null;
+//    }
+//  } else {
+//    System.out.println("r10");
+//    return null;
+//  }
+//}
 
   @Override
   public void getBlUsersSelf(List<String> include, boolean expandPerms,
