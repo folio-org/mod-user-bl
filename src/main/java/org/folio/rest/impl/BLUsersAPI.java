@@ -763,7 +763,7 @@ public class BLUsersAPI implements BlUsers {
       System.out.println("r5");
       String encodedPayload = tokenParts[1];
       System.out.println("r6");
-      byte[] decodedJsonBytes = Base64.getDecoder().decode(encodedPayload);
+      byte[] decodedJsonBytes = Base64.getUrlDecoder().decode(encodedPayload);
       System.out.println("r7");
       String decodedJson = new String(decodedJsonBytes);
       System.out.println("r8");
@@ -872,8 +872,8 @@ public class BLUsersAPI implements BlUsers {
        } catch (UnsupportedEncodingException e) {
         throw new RuntimeException(e);
       }
-      //var cql = "username==" + StringUtil.cqlEncode(encodedUsername);
-      var cql = "username==" + StringUtil.cqlEncode(entity.getUsername());
+      var cql = "username==" + StringUtil.urlEncode(encodedUsername);
+      //var cql = "username==" + StringUtil.cqlEncode(entity.getUsername());
       System.out.println("6");
       var userUrl = "/users?query=" + encode(cql);
       System.out.println("7");
