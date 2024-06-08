@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.apache.http.HttpStatus;
+import org.folio.rest.impl.BLUsersAPI;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.util.StringUtil;
@@ -23,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -31,7 +33,8 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(VertxUnitRunner.class)
 public class BLUsersAPITest {
@@ -701,4 +704,15 @@ public class BLUsersAPITest {
     byte[] bytes = payload.encode().getBytes(StandardCharsets.UTF_8);
     return String.format(JWT_TOKEN_PATTERN, JWT_TOKEN, Base64.getEncoder().encodeToString(bytes), "sig");
   }
+  @Test
+  public void testParseTokenPayload() throws Exception {
+    String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb2_DpCIsInVzZXJfaWQiOiI4M2Q4OGQxZi1lYWE5LTRjNTgtYTU3YS02YzNmZWIxMzk1ZjQiLCJ0eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE3NDg1NTIxLCJpYXQiOjE3MTc0ODQ5MjEsInRlbmFudCI6ImRpa3UifQ.JIHS_KVfFXq9vsIZa7tSnp2ZOOaEZn7leKUh3-kYOFs";
+    Method method = BLUsersAPI.class.getDeclaredMethod("parseTokenPayload", String.class);
+    method.setAccessible(true);
+    JsonObject payload = (JsonObject) method.invoke(new BLUsersAPI(vertx, "diku"), token);
+
+    assertNotNull(payload);
+    assertEquals("fooä", payload.getString("sub"));
+  }
+
 }
