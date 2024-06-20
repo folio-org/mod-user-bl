@@ -463,7 +463,7 @@ public class HeadersForwardingTest {
 
     JsonObject permsUsersPost = new JsonObject()
       .put("permissionUsers", new JsonArray()
-        .add(new JsonObject().put("permissions", new JsonArray())))
+        .add(new JsonObject().put("permissions", "INCORRECT")))
       .put("totalRecords", 0);
 
     WireMock.stubFor(get(urlPathEqualTo("/perms/users"))
@@ -486,7 +486,7 @@ public class HeadersForwardingTest {
       .when()
       .post(blUsersLoginEndpoint)
       .then()
-      .statusCode(201);
+      .statusCode(404);
 
     WireMock.verify(1, getRequestedFor(urlPathEqualTo("/users"))
       .withQueryParam("query", equalTo("username==\"" + USERNAME + "\"")));

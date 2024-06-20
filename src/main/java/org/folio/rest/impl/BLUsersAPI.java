@@ -1,7 +1,5 @@
 package org.folio.rest.impl;
 
-import static org.apache.commons.lang3.StringUtils.substringAfterLast;
-
 import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.vertx.core.*;
@@ -245,7 +243,7 @@ public class BLUsersAPI implements BlUsers {
           }
         }
 
-        logger.error("Error has been handled, message = {}", message, response.getException());
+        logger.error(message);
         previousFailure[0] = true;
         if(statusCode == 404){
           asyncResultHandler.handle(Future.succeededFuture(
@@ -753,16 +751,7 @@ public class BLUsersAPI implements BlUsers {
     if (payload == null) {
       return null;
     }
-    String tenant = payload.getString("tenant");
-    if (StringUtils.isNotBlank(tenant)) {
-      return tenant;
-    }
-    String iss = payload.getString("iss");
-
-    if (StringUtils.isBlank(iss)) {
-      return null;
-    }
-    return substringAfterLast(iss, "/");
+    return payload.getString("tenant");
   }
 
   private JsonObject parseTokenPayload(String token) {
@@ -918,7 +907,7 @@ public class BLUsersAPI implements BlUsers {
           //call perms once the /users?query=username={username} (same as creds) completes
           CompletableFuture<Response> permResponse = userResponse[0].thenCompose(
                 client.chainedRequest("/perms/users", okapiHeaders, new BuildCQL(null, "users[*].id", "userId"),
-                  handlePreviousResponse(false, false, false, aRequestHasFailed, asyncResultHandler)));
+                  handlePreviousResponse(false, true, true, aRequestHasFailed, asyncResultHandler)));
           requestedIncludes.add(permResponse);
           completedLookup.put(PERMISSIONS_INCLUDE, permResponse);
         }
@@ -1002,20 +991,17 @@ public class BLUsersAPI implements BlUsers {
           cf = completedLookup.get(PERMISSIONS_INCLUDE);
           if(cf != null && cf.get().getBody() != null){
             Response permsResponse = cf.get();
-            handleResponse(permsResponse, false, false, false, aRequestHasFailed, asyncResultHandler);
+            handleResponse(permsResponse, false, true, false, aRequestHasFailed, asyncResultHandler);
             if(!aRequestHasFailed[0]){
               Permissions p = cu.getPermissions();
-              JsonArray permissionUsers = permsResponse.getBody().getJsonArray("permissionUsers");
-              if (permissionUsers != null && !permissionUsers.isEmpty()) {
-                if(p != null){
-                  //expanded permissions requested and the array of permissions has been populated
-                  //add the username
-                  p.setUserId(permissionUsers.getJsonObject(0).getString("id"));
-                } else{
-                  //data coming in from the service isnt returned as required by the composite user schema
-                  JsonObject j = permissionUsers.getJsonObject(0);
-                  cu.setPermissions((Permissions) Response.convertToPojo(j, Permissions.class));
-                }
+              if(p != null){
+                //expanded permissions requested and the array of permissions has been populated
+                //add the username
+                p.setUserId(permsResponse.getBody().getJsonArray("permissionUsers").getJsonObject(0).getString("id"));
+              } else{
+                //data coming in from the service isnt returned as required by the composite user schema
+                JsonObject j = permsResponse.getBody().getJsonArray("permissionUsers").getJsonObject(0);
+                cu.setPermissions((Permissions) Response.convertToPojo(j, Permissions.class));
               }
             }
           }
