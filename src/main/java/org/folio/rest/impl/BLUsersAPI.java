@@ -295,7 +295,7 @@ public class BLUsersAPI implements BlUsers {
         groupTemplate = "{patronGroup}";
         mode[0] = "id";
       } else if (username != null) {
-        userUrl.append("?query=username==").append(username);
+        userUrl.append("?query=username==").append(URLEncoder.encode(username, StandardCharsets.UTF_8));
         userIdResponse[0] = client.request(userUrl.toString(), okapiHeaders);
         userTemplate = "{users[0].id}";
         groupTemplate = "{users[0].patronGroup}";

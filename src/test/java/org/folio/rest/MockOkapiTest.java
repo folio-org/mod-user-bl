@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -62,7 +63,7 @@ public class MockOkapiTest {
 
   JsonArray userList = new JsonArray()
           .add(new JsonObject()
-            .put("username", "bfrederi")
+            .put("username", "bfrederiñ")
             .put("id", bfrederiId)
             .put("active", true)
             .put("patronGroup", testGroupId)
@@ -312,7 +313,7 @@ public class MockOkapiTest {
       idList.add(sp3Id);
       return getServicePointsByQuery(context, idList);
     }).compose(w -> {
-      return getUserByQuery(context, "bfrederi");
+      return getUserByQuery(context, "bfrederiñ");
     }).compose(w -> {
       return getServicePointUser(context, bfrederiId, sp3Id, new JsonArray());
     }).compose(w -> {
@@ -655,7 +656,7 @@ public class MockOkapiTest {
   private Future<WrappedResponse> getUserByQuery(TestContext context, String username) {
     Promise<WrappedResponse> promise = promise();
     String url = String.format("http://localhost:%s/users?query=username==%s",
-            mockOkapiPort, username);
+            mockOkapiPort, URLEncoder.encode(username, StandardCharsets.UTF_8));
     testUtil.doRequest(vertx, url, GET, null, null).onComplete(res -> {
       if(res.failed()) {
         promise.fail(res.cause());
