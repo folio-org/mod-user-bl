@@ -298,7 +298,7 @@ public class BLUsersAPI implements BlUsers {
     CompletableFuture<Response>[] userIdResponse = new CompletableFuture[1];
     String userTemplate = "";
     String groupTemplate = "";
-    StringBuilder userUrl = new StringBuilder("/users");
+    StringBuffer userUrl = new StringBuffer("/users");
     String mode[] = new String[1];
     try {
       if (userid != null) {
@@ -308,9 +308,7 @@ public class BLUsersAPI implements BlUsers {
         groupTemplate = "{patronGroup}";
         mode[0] = "id";
       } else if (username != null) {
-        userUrl.append("?query=");
-        String usernameQuery = "username==" + StringUtil.cqlEncode(username);
-        userUrl.append(PercentCodec.encode(usernameQuery));
+        userUrl.append("?query=username==").append(username);
         userIdResponse[0] = client.request(userUrl.toString(), okapiHeaders);
         userTemplate = "{users[0].id}";
         groupTemplate = "{users[0].patronGroup}";
@@ -760,8 +758,8 @@ public class BLUsersAPI implements BlUsers {
     String[] tokenParts = token.split("\\.");
     if (tokenParts.length == 3) {
       String encodedPayload = tokenParts[1];
-      byte[] decodedJsonBytes = Base64.getUrlDecoder().decode(encodedPayload);
-      String decodedJson = new String(decodedJsonBytes, StandardCharsets.UTF_8);
+      byte[] decodedJsonBytes = Base64.getDecoder().decode(encodedPayload);
+      String decodedJson = new String(decodedJsonBytes);
       return new JsonObject(decodedJson);
     } else {
       return null;
